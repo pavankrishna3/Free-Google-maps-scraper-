@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google Maps Scraper Pro</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <!-- FontAwesome for Premium Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar Navigation & Config -->
+        <aside class="sidebar">
+            <div class="brand">
+                <i class="fa-solid fa-map-location-dot brand-icon"></i>
+                <div class="brand-text">
+                    <h1>G-Maps Scraper</h1>
+                    <span>Enterprise Edition</span>
+                </div>
+            </div>
+            
+            <form id="scrape-form" class="config-form">
+                <div class="form-group">
+                    <label for="query-input">
+                        <i class="fa-solid fa-magnifying-glass"></i> Search Query
+                    </label>
+                    <input 
+                        type="text" 
+                        id="query-input" 
+                        placeholder="e.g. Dentists in New York" 
+                        required 
+                        value="Coffee Shops in Seattle"
+                    >
+                    <small class="help-text">Enter the category and location combined.</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="max-results-input">
+                        <i class="fa-solid fa-list-ol"></i> Max Results
+                    </label>
+                    <input 
+                        type="number" 
+                        id="max-results-input" 
+                        min="1" 
+                        max="200" 
+                        value="10" 
+                        required
+                    >
+                    <small class="help-text">Number of listings to pull.</small>
+                </div>
+
+                <div class="form-group toggle-group">
+                    <label class="toggle-container">
+                        <input type="checkbox" id="headless-checkbox" checked>
+                        <span class="checkmark"></span>
+                        <span class="label-text">
+                            Run Headless Browser
+                            <small>Run scraper invisibly in background</small>
+                        </span>
+                    </label>
+                </div>
+
+                <button type="submit" id="start-btn" class="btn btn-primary">
+                    <i class="fa-solid fa-play"></i> Start Scraper
+                </button>
+
+                <button type="button" id="stop-btn" class="btn btn-danger" disabled>
+                    <i class="fa-solid fa-stop"></i> Stop Scraper
+                </button>
+            </form>
+
+            <div class="sidebar-footer">
+                <p>Status: <span id="status-badge" class="badge idle">Idle</span></p>
+            </div>
+        </aside>
+
+        <!-- Main Dashboard Panel -->
+        <main class="main-content">
+            <!-- Top Actions/Stats Header -->
+            <header class="dashboard-header">
+                <div class="header-title">
+                    <h2>Lead Generation Dashboard</h2>
+                    <p>Scrape, analyze, and build targeted business contact lists.</p>
+                </div>
+                <div class="header-actions">
+                    <button id="download-btn" class="btn btn-success" disabled>
+                        <i class="fa-solid fa-file-csv"></i> Download CSV
+                    </button>
+                </div>
+            </header>
+
+            <!-- Stat Counters -->
+            <section class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon purple">
+                        <i class="fa-solid fa-store"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="stat-found">0</h3>
+                        <p>Total Found</p>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon blue">
+                        <i class="fa-solid fa-globe"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="stat-websites">0</h3>
+                        <p>Websites Found</p>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon green">
+                        <i class="fa-solid fa-envelope"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="stat-emails">0</h3>
+                        <p>Emails Found</p>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon gold">
+                        <i class="fa-solid fa-user-tie"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="stat-owners">0</h3>
+                        <p>Owners Found</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Console Log Panel -->
+            <section class="panel console-panel">
+                <div class="panel-header">
+                    <h3><i class="fa-solid fa-terminal"></i> Live Scraper Logs</h3>
+                    <button id="clear-logs-btn" class="btn-text">Clear Logs</button>
+                </div>
+                <div class="console-body" id="console-logs">
+                    <div class="log-line system">[System] Dashboard initialized. Configure settings and click 'Start Scraper'.</div>
+                </div>
+            </section>
+
+            <!-- Leads Table Panel -->
+            <section class="panel table-panel">
+                <div class="panel-header">
+                    <h3><i class="fa-solid fa-table-list"></i> Scraped Business Listings</h3>
+                    <div class="table-actions">
+                        <span class="table-count" id="table-count-label">0 records</span>
+                    </div>
+                </div>
+                <div class="table-container">
+                    <table id="leads-table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Phone</th>
+                                <th>Website</th>
+                                <th>Email(s)</th>
+                                <th>Owner Name</th>
+                                <th>Rating</th>
+                                <th>Socials</th>
+                                <th>Address</th>
+                            </tr>
+                        </thead>
+                        <tbody id="leads-tbody">
+                            <tr id="empty-row">
+                                <td colspan="8" class="text-center">No leads scraped yet. Start a scrape session.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+    </div>
+    <script src="app.js"></script>
+</body>
+</html>
